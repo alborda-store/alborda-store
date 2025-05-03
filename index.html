@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر البردة - الرئيسية</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري، لتخصيص الألوان أو الخطوط) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // يمكنك إضافة خطوط عربية هنا إذا أردت
+                        // 'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4a5568', // مثال للون أساسي
+                        secondary: '#a0aec0', // مثال للون ثانوي
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* يمكنك إضافة أنماط إضافية هنا إذا لزم الأمر */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- الشعار -->
+            <a href="index.html" class="text-2xl font-bold text-primary">متجر البردة</a>
+
+            <!-- روابط التنقل (للشاشات الكبيرة) -->
+            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-gray-600 hover:text-primary">الرئيسية</a>
+                <a href="products.html" class="text-gray-600 hover:text-primary">المنتجات</a>
+                <a href="my-orders.html" class="text-gray-600 hover:text-primary hidden" id="nav-my-orders-link">طلباتي</a>
+                <a href="about.html" class="text-gray-600 hover:text-primary">من نحن</a>
+                <a href="contact.html" class="text-gray-600 hover:text-primary">تواصل معنا</a>
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <!-- روابط تسجيل الدخول/الملف الشخصي -->
+                <a href="login.html" class="text-gray-600 hover:text-primary" id="nav-login-link">تسجيل الدخول</a>
+                <a href="profile.html" class="text-gray-600 hover:text-primary hidden" id="nav-profile-link">
+                    <i class="fas fa-user"></i> ملفي الشخصي
+                </a>
+                <button class="text-gray-600 hover:text-red-500 hidden" id="nav-logout-button">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+
+            <!-- زر القائمة للموبايل -->
+            <div class="md:hidden flex items-center">
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary ml-4">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="mobile-cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span> <!-- تأكد من وجود معرف فريد إذا لزم الأمر -->
+                </a>
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- القائمة المنسدلة للموبايل -->
+        <div id="mobile-menu" class="md:hidden bg-white border-t hidden">
+            <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">الرئيسية</a>
+            <a href="products.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">المنتجات</a>
+            <a href="my-orders.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-my-orders-link">طلباتي</a>
+            <a href="about.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">من نحن</a>
+            <a href="contact.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">تواصل معنا</a>
+            <hr class="my-1">
+            <!-- روابط تسجيل الدخول/الملف الشخصي للموبايل -->
+            <a href="login.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100" id="mobile-login-link">تسجيل الدخول</a>
+            <a href="profile.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-profile-link">ملفي الشخصي</a>
+            <button class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100 hidden" id="mobile-logout-button">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي للصفحة الرئيسية -->
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- بانر ترحيبي أو عرض خاص -->
+        <section class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg p-8 md:p-12 mb-12 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">أهلاً بك في متجر البردة</h1>
+            <p class="text-lg md:text-xl mb-6">اكتشف أحدث تشكيلات الملابس العصرية بأفضل الأسعار.</p>
+            <a href="products.html" class="bg-white text-indigo-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition duration-300">تسوق الآن</a>
+        </section>
+
+        <!-- قسم المنتجات المميزة (سلايدر أو شبكة) -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-6 text-center">منتجات مميزة</h2>
+            <!-- حاوية المنتجات المميزة -->
+            <div id="featured-products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- سيتم ملء المنتجات هنا بواسطة JavaScript -->
+                <!-- مثال لعنصر نائب (Placeholder) -->
+                <div class="bg-white rounded-lg shadow overflow-hidden animate-pulse">
+                    <div class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-hidden animate-pulse">
+                    <div class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-hidden animate-pulse hidden sm:block">
+                    <div class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-hidden animate-pulse hidden lg:block">
+                    <div class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- أقسام أخرى (اختياري) -->
+        <!-- مثل: أحدث الوصول، الفئات، شهادات العملاء -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white p-6 rounded-lg shadow text-center">
+                <i class="fas fa-shipping-fast text-3xl text-indigo-500 mb-3"></i>
+                <h3 class="font-semibold mb-2">شحن سريع وموثوق</h3>
+                <p class="text-sm text-gray-600">توصيل طلباتك إلى باب منزلك في أسرع وقت.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow text-center">
+                <i class="fas fa-headset text-3xl text-indigo-500 mb-3"></i>
+                <h3 class="font-semibold mb-2">دعم فني متميز</h3>
+                <p class="text-sm text-gray-600">فريقنا جاهز لمساعدتك والإجابة على استفساراتك.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow text-center">
+                <i class="fas fa-undo text-3xl text-indigo-500 mb-3"></i>
+                <h3 class="font-semibold mb-2">إرجاع سهل</h3>
+                <p class="text-sm text-gray-600">سياسة إرجاع مرنة لضمان رضاك التام.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 متجر البردة. جميع الحقوق محفوظة.</p>
+            <!-- يمكنك إضافة روابط لوسائل التواصل الاجتماعي أو روابط أخرى هنا -->
+            <div class="mt-4 space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <!-- تأكد من استبدالها بأحدث إصدارات SDK المتوافقة مع v9 أو أحدث -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/firestore.js"></script>
+    <script src="js/cart.js"></script>
+    <!-- <script src="js/storage.js"></script> --> <!-- قد لا تكون هناك حاجة إليه مباشرة في index.html -->
+
+    <!-- Page-Specific JavaScript for Index -->
+    <script>
+        // تهيئة Firebase
+        if (typeof firebaseConfig !== 'undefined') {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully on index page.");
+
+                // مراقبة حالة المصادقة لتحديث واجهة المستخدم (مثل إظهار/إخفاء روابط تسجيل الدخول/الخروج)
+                observeAuthState();
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                // يمكنك عرض رسالة خطأ للمستخدم هنا
+            }
+        } else {
+            console.error("Firebase config is not defined. Check firebase-config.js");
+        }
+
+        /**
+         * تحميل وعرض المنتجات المميزة.
+         */
+        async function loadFeaturedProducts() {
+            console.log("Loading featured products...");
+            const container = document.getElementById("featured-products-container");
+            if (!container) return;
+
+            // استخدام دالة جلب المنتجات من firestore.js
+            // يمكنك إضافة خيار لجلب المنتجات المميزة فقط (مثلاً عبر حقل 'featured: true')
+            // أو جلب عدد محدود من المنتجات الأحدث أو الأعلى تقييماً
+            try {
+                const db = firebase.firestore();
+                // جلب أول 4 منتجات مرتبة بالاسم كمثال
+                const products = await fetchProducts(db, { limit: 4, sortBy: 'name' });
+
+                container.innerHTML = ''; // إزالة العناصر النائبة
+
+                if (products.length === 0) {
+                    container.innerHTML = `<p class="text-center text-gray-500 col-span-full">لا توجد منتجات مميزة لعرضها حالياً.</p>`;
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = document.createElement("div");
+                    productCard.classList.add("bg-white", "rounded-lg", "shadow", "overflow-hidden", "group");
+                    productCard.innerHTML = `
+                        <a href="product-details.html?id=${product.id}" class="block">
+                            <img src="${product.imageUrl || 'assets/images/placeholder.png'}" alt="${product.name}" class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity">
+                        </a>
+                        <div class="p-4">
+                            <h3 class="font-semibold mb-1">
+                                <a href="product-details.html?id=${product.id}" class="text-gray-800 hover:text-primary">${product.name}</a>
+                            </h3>
+                            <p class="text-primary font-bold mb-2">$${product.price.toFixed(2)}</p>
+                            <button onclick="handleAddToCartClick('${product.id}', '${product.name}', ${product.price}, '${product.imageUrl || ''}')" class="w-full bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-300 text-sm">
+                                <i class="fas fa-cart-plus mr-1 ml-1"></i> إضافة للسلة
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(productCard);
+                });
+
+            } catch (error) {
+                console.error("Error loading featured products:", error);
+                container.innerHTML = `<p class="text-center text-red-500 col-span-full">حدث خطأ أثناء تحميل المنتجات المميزة.</p>`;
+            }
+        }
+
+        /**
+         * معالج النقر على زر إضافة للسلة من الصفحة الرئيسية.
+         * @param {string} id
+         * @param {string} name
+         * @param {number} price
+         * @param {string} imageUrl
+         */
+        function handleAddToCartClick(id, name, price, imageUrl) {
+            // نفترض عدم وجود خيار للمقاس في الصفحة الرئيسية
+            const product = { id, name, price, imageUrl };
+            addToCart(product, 1, null); // استخدام دالة addToCart من cart.js
+            // يمكنك إضافة رسالة تأكيد مرئية هنا إذا أردت
+        }
+
+        // استدعاء تحميل المنتجات المميزة عند تحميل الصفحة
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                loadFeaturedProducts();
+            } else {
+                // قد تحتاج إلى الانتظار حتى يتم تهيئة Firebase
+                // أو وضع استدعاء loadFeaturedProducts داخل onAuthStateChanged أو بعد تأكيد التهيئة
+                console.warn("Firebase not ready yet for loading featured products.");
+                // محاولة التحميل بعد فترة قصيرة كحل بديل
+                setTimeout(() => {
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        loadFeaturedProducts();
+                    }
+                }, 1000);
+            }
+        });
+
+    </script>
+
+</body>
+</html>
+

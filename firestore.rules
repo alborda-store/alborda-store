@@ -1,0 +1,60 @@
+// Firestore Rules v2:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // منتجات: للكل قراءة فقط، والكتابة فقط للأدمِن
+    // Products: Read-only for everyone, write only for admin
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    // طلبات: إنشاء للعضو بعد تسجيل الدخول، وقراءة لطلبات المستخدم فقط أو للأدمن
+    // Orders: Create for logged-in users, read own orders or if admin
+    match /orders/{orderId} {
+      allow create: if request.auth != null;
+      // السماح للمستخدم بقراءة طلباته أو للأدمن بقراءة جميع الطلبات
+      // Allow user to read their orders or admin to read all orders
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+      // السماح للأدمن بتحديث حالة الطلب فقط
+      // Allow admin to update only the order status
+      allow update: if request.auth != null && request.auth.token.admin == true && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+    }
+    // تقييمات ومراجعات المنتجات: إنشاء للعضو المسجل، قراءة للجميع
+    // Reviews: Create for logged-in users, read for everyone
+    match /reviews/{reviewId} {
+      allow create: if request.auth != null;
+      allow read: if true;
+      // يمكن للمستخدم تعديل/حذف تقييمه الخاص (اختياري)
+      // User can update/delete their own review (optional)
+      // allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    // رسائل الشات (ضمن الطلبات): إنشاء للعضو المسجل، قراءة لصاحب الرسالة أو الأدمن
+    // Chat messages (within orders): Create for logged-in user, read by message owner or admin
+    match /orders/{orderId}/messages/{msgId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+    }
+    // بيانات المستخدمين: قراءة وإنشاء وتحديث (باستثناء isAdmin) للمستخدم نفسه، قراءة للأدمن
+    // User data: Read, create, update (except isAdmin) for self, read for admin
+    match /users/{userId} {
+      allow read, create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId && !('isAdmin' in request.resource.data);
+      allow read: if request.auth != null && request.auth.token.admin == true; // Admin read access
+    }
+    // قائمة الأمنيات: قراءة وكتابة وحذف للمستخدم نفسه
+    // Wishlist: Read, write, delete for self
+    match /users/{userId}/wishlist/{productId} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    // العناوين المحفوظة: قراءة وكتابة وحذف للمستخدم نفسه
+    // Saved Addresses: Read, write, delete for self
+    match /users/{userId}/addresses/{addressId} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    // طرق الدفع المحفوظة: قراءة وكتابة وحذف للمستخدم نفسه (توخ الحذر)
+    // Saved Payment Methods: Read, write, delete for self (Use caution)
+    match /users/{userId}/paymentMethods/{paymentMethodId} {
+       allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

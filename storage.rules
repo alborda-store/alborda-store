@@ -1,0 +1,25 @@
+// Storage Rules v2:
+rules_version = '2';
+service firebase.storage {
+  // تحديد الدلو (bucket) الخاص بمشروعك
+  // Specify your project's bucket
+  match /b/{bucket}/o {
+    // السماح بقراءة صور المنتجات للجميع
+    // Allow public read access for product images
+    // السماح بالكتابة (الرفع والحذف والتعديل) فقط للمستخدمين المسجلين الذين لديهم صلاحيات الأدمن
+    // Allow write (upload, delete, update) only for authenticated admin users
+    match /product_images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // (اختياري) يمكنك إضافة قواعد أخرى لمسارات مختلفة هنا
+    // (Optional) You can add other rules for different paths here
+    // مثال: السماح للمستخدمين المسجلين برفع صور ملفاتهم الشخصية
+    // Example: Allow authenticated users to upload their profile pictures
+    // match /user_profiles/{userId}/{allPaths=**} {
+    //   allow read: if true; // أو حسب الحاجة
+    //   allow write: if request.auth != null && request.auth.uid == userId;
+    // }
+  }
+}

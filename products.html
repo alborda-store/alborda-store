@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر البردة - المنتجات</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // 'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header / Navbar (نفس الهيدر المستخدم في index.html) -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-primary">متجر البردة</a>
+            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-gray-600 hover:text-primary">الرئيسية</a>
+                <a href="products.html" class="text-primary font-semibold">المنتجات</a> <!-- تمييز الصفحة الحالية -->
+                <a href="my-orders.html" class="text-gray-600 hover:text-primary hidden" id="nav-my-orders-link">طلباتي</a>
+                <a href="about.html" class="text-gray-600 hover:text-primary">من نحن</a>
+                <a href="contact.html" class="text-gray-600 hover:text-primary">تواصل معنا</a>
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <a href="login.html" class="text-gray-600 hover:text-primary" id="nav-login-link">تسجيل الدخول</a>
+                <a href="profile.html" class="text-gray-600 hover:text-primary hidden" id="nav-profile-link"><i class="fas fa-user"></i> ملفي الشخصي</a>
+                <button class="text-gray-600 hover:text-red-500 hidden" id="nav-logout-button"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+            <div class="md:hidden flex items-center">
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary ml-4">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="mobile-cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none"><i class="fas fa-bars text-xl"></i></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden bg-white border-t hidden">
+            <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">الرئيسية</a>
+            <a href="products.html" class="block px-4 py-2 text-primary bg-gray-100">المنتجات</a> <!-- تمييز الصفحة الحالية -->
+            <a href="my-orders.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-my-orders-link">طلباتي</a>
+            <a href="about.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">من نحن</a>
+            <a href="contact.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">تواصل معنا</a>
+            <hr class="my-1">
+            <a href="login.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100" id="mobile-login-link">تسجيل الدخول</a>
+            <a href="profile.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-profile-link">ملفي الشخصي</a>
+            <button class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100 hidden" id="mobile-logout-button">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي لصفحة المنتجات -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 text-center">جميع المنتجات</h1>
+
+        <!-- شريط البحث والفلاتر -->
+        <section class="bg-white p-4 rounded-lg shadow mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <!-- البحث بالاسم -->
+                <div>
+                    <label for="search-term" class="block text-sm font-medium text-gray-700 mb-1">بحث بالاسم</label>
+                    <input type="text" id="search-term" placeholder="ابحث عن منتج..." class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                </div>
+                <!-- الفلترة حسب الفئة -->
+                <div>
+                    <label for="filter-category" class="block text-sm font-medium text-gray-700 mb-1">الفئة</label>
+                    <select id="filter-category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="all">الكل</option>
+                        <!-- سيتم ملء الفئات هنا بواسطة JavaScript -->
+                        <option value="ملابس رجالية">ملابس رجالية</option>
+                        <option value="ملابس نسائية">ملابس نسائية</option>
+                        <option value="أطفال">أطفال</option>
+                        <option value="إكسسوارات">إكسسوارات</option>
+                    </select>
+                </div>
+                <!-- الفلترة حسب السعر -->
+                <div>
+                    <label for="filter-sort" class="block text-sm font-medium text-gray-700 mb-1">الترتيب حسب</label>
+                    <select id="filter-sort" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="name">الاسم (أبجدي)</option>
+                        <option value="price_asc">السعر (من الأقل للأعلى)</option>
+                        <option value="price_desc">السعر (من الأعلى للأقل)</option>
+                        <!-- يمكنك إضافة خيارات أخرى مثل التقييم أو الأحدث -->
+                    </select>
+                </div>
+                <!-- زر تطبيق الفلاتر -->
+                <div class="text-left">
+                    <button id="apply-filters-button" class="bg-primary text-white py-2 px-6 rounded hover:bg-opacity-90 transition duration-300 w-full md:w-auto">
+                        <i class="fas fa-filter mr-1 ml-1"></i> تطبيق
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- رسالة حالة التحميل أو الخطأ -->
+        <div id="products-status-message" class="text-center my-8 hidden"></div>
+
+        <!-- شبكة عرض المنتجات -->
+        <section id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- سيتم ملء المنتجات هنا بواسطة JavaScript -->
+            <!-- مثال لعناصر نائبة (Placeholders) أثناء التحميل -->
+            <div class="product-placeholder bg-white rounded-lg shadow overflow-hidden animate-pulse">
+                <div class="w-full h-48 bg-gray-300"></div>
+                <div class="p-4">
+                    <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+            </div>
+             <div class="product-placeholder bg-white rounded-lg shadow overflow-hidden animate-pulse">
+                <div class="w-full h-48 bg-gray-300"></div>
+                <div class="p-4">
+                    <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+            </div>
+             <div class="product-placeholder bg-white rounded-lg shadow overflow-hidden animate-pulse hidden md:block">
+                <div class="w-full h-48 bg-gray-300"></div>
+                <div class="p-4">
+                    <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+            </div>
+             <div class="product-placeholder bg-white rounded-lg shadow overflow-hidden animate-pulse hidden lg:block">
+                <div class="w-full h-48 bg-gray-300"></div>
+                <div class="p-4">
+                    <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+            </div>
+            <!-- نهاية العناصر النائبة -->
+        </section>
+
+        <!-- (اختياري) ترقيم الصفحات إذا كان عدد المنتجات كبيراً -->
+        <!-- <nav class="mt-8 text-center">
+            <ul class="inline-flex items-center -space-x-px">
+                <li><a href="#" class="py-2 px-3 ml-0 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">السابق</a></li>
+                <li><a href="#" class="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">1</a></li>
+                <li><a href="#" aria-current="page" class="py-2 px-3 text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700">2</a></li>
+                <li><a href="#" class="py-2 px-3 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">التالي</a></li>
+            </ul>
+        </nav> -->
+
+    </main>
+
+    <!-- Footer (نفس الفوتر المستخدم في index.html) -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 متجر البردة. جميع الحقوق محفوظة.</p>
+            <div class="mt-4 space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> --> <!-- قد لا تكون هناك حاجة إليه هنا -->
+
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/firestore.js"></script>
+    <script src="js/cart.js"></script>
+
+    <!-- Page-Specific JavaScript for Products -->
+    <script>
+        // تهيئة Firebase
+        if (typeof firebaseConfig !== 'undefined') {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully on products page.");
+                observeAuthState(); // مراقبة حالة المصادقة لتحديث الهيدر
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                displayStatusMessage("حدث خطأ في تهيئة الاتصال. يرجى تحديث الصفحة.", "error");
+            }
+        } else {
+            console.error("Firebase config is not defined. Check firebase-config.js");
+            displayStatusMessage("خطأ في تحميل إعدادات التطبيق.", "error");
+        }
+
+        const productsGrid = document.getElementById("products-grid");
+        const statusMessage = document.getElementById("products-status-message");
+        const applyFiltersButton = document.getElementById("apply-filters-button");
+        const searchTermInput = document.getElementById("search-term");
+        const categoryFilter = document.getElementById("filter-category");
+        const sortFilter = document.getElementById("filter-sort");
+
+        /**
+         * عرض رسالة حالة (تحميل، خطأ، لا توجد نتائج).
+         * @param {string} message - نص الرسالة.
+         * @param {'info' | 'error' | 'success'} type - نوع الرسالة.
+         */
+        function displayStatusMessage(message, type = 'info') {
+            if (!statusMessage) return;
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'text-red-500', 'text-gray-500');
+            if (type === 'error') {
+                statusMessage.classList.add('text-red-500');
+            } else {
+                statusMessage.classList.add('text-gray-500');
+            }
+            statusMessage.classList.remove('hidden');
+        }
+
+        /**
+         * إخفاء رسالة الحالة.
+         */
+        function hideStatusMessage() {
+            if (statusMessage) statusMessage.classList.add('hidden');
+        }
+
+        /**
+         * عرض العناصر النائبة (Placeholders) أثناء التحميل.
+         */
+        function showPlaceholders() {
+            if (!productsGrid) return;
+            productsGrid.innerHTML = ''; // مسح المحتوى القديم
+            // إضافة عدد مناسب من العناصر النائبة
+            for (let i = 0; i < 8; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'product-placeholder bg-white rounded-lg shadow overflow-hidden animate-pulse';
+                placeholder.innerHTML = `
+                    <div class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                `;
+                // إخفاء بعض العناصر النائبة على الشاشات المختلفة لمحاكاة الشبكة
+                if (i >= 4 && i < 6) placeholder.classList.add('hidden', 'md:block');
+                if (i >= 6) placeholder.classList.add('hidden', 'lg:block');
+                productsGrid.appendChild(placeholder);
+            }
+            hideStatusMessage();
+        }
+
+        /**
+         * تحميل وعرض المنتجات بناءً على الفلاتر والبحث.
+         */
+        async function loadAndDisplayProducts() {
+            if (!firebase.apps.length) {
+                console.warn("Firebase not ready yet.");
+                displayStatusMessage("جاري تهيئة الاتصال...", "info");
+                return;
+            }
+            if (!productsGrid) return;
+
+            console.log("Loading products...");
+            showPlaceholders(); // عرض العناصر النائبة
+
+            const db = firebase.firestore();
+            const searchTerm = searchTermInput.value.trim().toLowerCase();
+            const category = categoryFilter.value;
+            const sortBy = sortFilter.value;
+
+            const options = {
+                sortBy: sortBy,
+                // لا يمكن تطبيق فلتر الفئة مباشرة مع البحث النصي الكامل في Firestore بكفاءة
+                // سنقوم بجلب المنتجات ثم تصفيتها من جانب العميل للبحث والفئة
+                // إذا كانت الفئة محددة، يمكن استخدامها كشرط where
+                category: (category !== 'all') ? category : null
+            };
+
+            try {
+                // استخدام دالة fetchProducts من firestore.js
+                let products = await fetchProducts(db, options);
+
+                // 1. تصفية حسب الفئة (إذا لم يتم تطبيقها في الاستعلام)
+                if (!options.category && category !== 'all') {
+                    products = products.filter(p => p.category === category);
+                }
+
+                // 2. تصفية حسب مصطلح البحث (بحث بسيط في الاسم والوصف)
+                if (searchTerm) {
+                    products = products.filter(p =>
+                        (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                        (p.description && p.description.toLowerCase().includes(searchTerm))
+                    );
+                }
+
+                productsGrid.innerHTML = ''; // مسح العناصر النائبة أو النتائج القديمة
+
+                if (products.length === 0) {
+                    displayStatusMessage("لم يتم العثور على منتجات تطابق بحثك.", "info");
+                    return;
+                }
+
+                hideStatusMessage();
+
+                products.forEach(product => {
+                    const productCard = document.createElement("div");
+                    productCard.classList.add("bg-white", "rounded-lg", "shadow", "overflow-hidden", "group", "flex", "flex-col"); // flex-col لتثبيت الزر بالأسفل
+                    productCard.innerHTML = `
+                        <a href="product-details.html?id=${product.id}" class="block">
+                            <img src="${product.imageUrl || 'assets/images/placeholder.png'}" alt="${product.name}" class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity">
+                        </a>
+                        <div class="p-4 flex flex-col flex-grow"> <!-- flex-grow لدفع الزر للأسفل -->
+                            <h3 class="font-semibold mb-1 flex-grow">
+                                <a href="product-details.html?id=${product.id}" class="text-gray-800 hover:text-primary line-clamp-2">${product.name}</a>
+                            </h3>
+                            <p class="text-primary font-bold mb-3">$${product.price.toFixed(2)}</p>
+                            <button onclick="handleAddToCartClick('${product.id}', '${product.name}', ${product.price}, '${product.imageUrl || ''}')" class="mt-auto w-full bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-300 text-sm">
+                                <i class="fas fa-cart-plus mr-1 ml-1"></i> إضافة للسلة
+                            </button>
+                        </div>
+                    `;
+                    productsGrid.appendChild(productCard);
+                });
+
+            } catch (error) {
+                console.error("Error loading products:", error);
+                productsGrid.innerHTML = ''; // مسح العناصر النائبة
+                displayStatusMessage("حدث خطأ أثناء تحميل المنتجات. يرجى المحاولة مرة أخرى.", "error");
+            }
+        }
+
+        /**
+         * معالج النقر على زر إضافة للسلة من صفحة المنتجات.
+         * @param {string} id
+         * @param {string} name
+         * @param {number} price
+         * @param {string} imageUrl
+         */
+        function handleAddToCartClick(id, name, price, imageUrl) {
+            // نفترض عدم وجود خيار للمقاس في صفحة قائمة المنتجات
+            const product = { id, name, price, imageUrl };
+            addToCart(product, 1, null); // استخدام دالة addToCart من cart.js
+            // يمكنك إضافة رسالة تأكيد مرئية هنا باستخدام showUserMessage
+            // مثال:
+            // showUserMessage("cart-feedback", `تمت إضافة ${name} للسلة!`, "success", 3000);
+            // تأكد من وجود عنصر <div id="cart-feedback"></div> في مكان مناسب بالصفحة
+        }
+
+        // ربط حدث النقر بزر تطبيق الفلاتر
+        if (applyFiltersButton) {
+            applyFiltersButton.addEventListener("click", loadAndDisplayProducts);
+        }
+        // ربط حدث الضغط على Enter في حقل البحث
+        if (searchTermInput) {
+            searchTermInput.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    loadAndDisplayProducts();
+                }
+            });
+        }
+
+        // تحميل المنتجات عند تحميل الصفحة لأول مرة
+        document.addEventListener("DOMContentLoaded", () => {
+            // تأخير بسيط للتأكد من تهيئة Firebase
+            setTimeout(() => {
+                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    loadAndDisplayProducts();
+                 } else {
+                     // محاولة أخرى بعد فترة أطول قليلاً
+                     setTimeout(loadAndDisplayProducts, 1500);
+                 }
+            }, 500);
+        });
+
+    </script>
+
+</body>
+</html>
+

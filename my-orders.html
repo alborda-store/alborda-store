@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر البردة - طلباتي</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // 'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header / Navbar (نفس الهيدر المستخدم في الصفحات الأخرى) -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-primary">متجر البردة</a>
+            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-gray-600 hover:text-primary">الرئيسية</a>
+                <a href="products.html" class="text-gray-600 hover:text-primary">المنتجات</a>
+                <a href="my-orders.html" class="text-primary font-semibold" id="nav-my-orders-link">طلباتي</a> <!-- تمييز الصفحة الحالية -->
+                <a href="about.html" class="text-gray-600 hover:text-primary">من نحن</a>
+                <a href="contact.html" class="text-gray-600 hover:text-primary">تواصل معنا</a>
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <a href="login.html" class="text-gray-600 hover:text-primary" id="nav-login-link">تسجيل الدخول</a>
+                <a href="profile.html" class="text-gray-600 hover:text-primary hidden" id="nav-profile-link"><i class="fas fa-user"></i> ملفي الشخصي</a>
+                <button class="text-gray-600 hover:text-red-500 hidden" id="nav-logout-button"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+            <div class="md:hidden flex items-center">
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary ml-4">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="mobile-cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none"><i class="fas fa-bars text-xl"></i></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden bg-white border-t hidden">
+            <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">الرئيسية</a>
+            <a href="products.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">المنتجات</a>
+            <a href="my-orders.html" class="block px-4 py-2 text-primary bg-gray-100" id="mobile-my-orders-link">طلباتي</a> <!-- تمييز الصفحة الحالية -->
+            <a href="about.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">من نحن</a>
+            <a href="contact.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">تواصل معنا</a>
+            <hr class="my-1">
+            <a href="login.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100" id="mobile-login-link">تسجيل الدخول</a>
+            <a href="profile.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-profile-link">ملفي الشخصي</a>
+            <button class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100 hidden" id="mobile-logout-button">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي لصفحة طلباتي -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 text-center">طلباتي</h1>
+
+        <!-- رسالة للمستخدم إذا لم يكن مسجلاً للدخول -->
+        <div id="login-required-message-orders" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow hidden" role="alert">
+            <p class="font-bold">مطلوب تسجيل الدخول</p>
+            <p>يرجى <a href="login.html?redirect=my-orders.html" class="underline font-semibold">تسجيل الدخول</a> لعرض طلباتك.</p>
+        </div>
+
+        <!-- حاوية عرض الطلبات -->
+        <div id="orders-content" class="hidden">
+            <!-- رسالة حالة التحميل أو الخطأ -->
+            <div id="orders-status-message" class="text-center my-8 hidden"></div>
+
+            <!-- قائمة الطلبات -->
+            <div id="orders-list" class="space-y-6">
+                <!-- سيتم ملء الطلبات هنا بواسطة JavaScript -->
+                <!-- مثال لعنصر نائب (Placeholder) -->
+                <div class="order-placeholder bg-white rounded-lg shadow p-4 animate-pulse">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="h-4 bg-gray-300 rounded w-1/4"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/6"></div>
+                    </div>
+                    <div class="h-3 bg-gray-300 rounded w-1/2 mb-2"></div>
+                    <div class="h-3 bg-gray-300 rounded w-1/3"></div>
+                </div>
+                <!-- مثال لطلب مكتمل -->
+                <!--
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                        <div>
+                            <p class="text-sm text-gray-500">رقم الطلب: <span class="font-medium text-gray-700">ORDER12345</span></p>
+                            <p class="text-sm text-gray-500">تاريخ الطلب: <span class="font-medium text-gray-700">01 مايو 2025</span></p>
+                        </div>
+                        <span class="text-sm font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">تم التوصيل</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="assets/images/placeholder.png" alt="اسم المنتج" class="w-12 h-12 object-cover rounded mr-3 ml-3">
+                            <p class="text-sm">منتج 1, منتج 2...</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="font-semibold">المجموع: $45.98</p>
+                            <div>
+                                <button class="text-sm text-indigo-600 hover:underline mr-3 ml-3 view-order-details-button" data-order-id="ORDER12345">عرض التفاصيل</button>
+                                <button class="text-sm text-blue-600 hover:underline chat-with-support-button" data-order-id="ORDER12345"><i class="fas fa-comments mr-1 ml-1"></i> محادثة</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+
+        <!-- نافذة تفاصيل الطلب (Modal) -->
+        <div id="order-details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-60 hidden flex items-center justify-center p-4">
+            <div class="relative bg-white w-full max-w-2xl mx-auto rounded-lg shadow-xl">
+                <!-- رأس النافذة -->
+                <div class="flex justify-between items-center border-b p-4">
+                    <h3 class="text-xl font-semibold">تفاصيل الطلب (<span id="modal-order-id"></span>)</h3>
+                    <button id="close-modal-button" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                </div>
+                <!-- محتوى النافذة -->
+                <div id="modal-order-content" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <!-- سيتم ملء التفاصيل هنا -->
+                    <p>جاري تحميل التفاصيل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- (اختياري) نافذة المحادثة (Modal أو قسم منفصل) -->
+        <div id="chat-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-60 hidden flex items-center justify-center p-4">
+             <div class="relative bg-white w-full max-w-md mx-auto rounded-lg shadow-xl flex flex-col" style="height: 80vh;">
+                <!-- رأس المحادثة -->
+                <div class="flex justify-between items-center border-b p-3 bg-gray-50">
+                    <h3 class="text-lg font-semibold">محادثة بخصوص الطلب (<span id="chat-order-id"></span>)</h3>
+                    <button id="close-chat-button" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                </div>
+                <!-- منطقة الرسائل -->
+                <div id="chat-messages" class="flex-grow p-4 space-y-3 overflow-y-auto bg-gray-100">
+                    <!-- سيتم ملء الرسائل هنا -->
+                    <p class="text-center text-gray-500 text-sm">جاري تحميل المحادثة...</p>
+                    <!-- مثال لرسالة -->
+                    <!-- <div class="flex justify-start">
+                        <div class="bg-blue-100 text-blue-800 p-2 rounded-lg max-w-xs">
+                            مرحباً، كيف يمكنني المساعدة؟
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="bg-green-100 text-green-800 p-2 rounded-lg max-w-xs">
+                            أريد الاستفسار عن حالة طلبي.
+                        </div>
+                    </div> -->
+                </div>
+                <!-- منطقة إدخال الرسالة -->
+                <div class="border-t p-3 flex items-center">
+                    <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا..." class="flex-grow border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mr-2 ml-2">
+                    <button id="send-chat-button" class="bg-primary text-white p-2 rounded hover:bg-opacity-90">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer (نفس الفوتر المستخدم في الصفحات الأخرى) -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 متجر البردة. جميع الحقوق محفوظة.</p>
+            <div class="mt-4 space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> -->
+
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/firestore.js"></script>
+    <script src="js/cart.js"></script> <!-- لتحديث عدد عناصر السلة في الهيدر -->
+
+    <!-- Page-Specific JavaScript for My Orders -->
+    <script>
+        let currentUser = null;
+        let currentChatListener = null; // لتخزين مستمع رسائل المحادثة الحالي
+
+        // تهيئة Firebase
+        if (typeof firebaseConfig !== 'undefined') {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully on my-orders page.");
+
+                // مراقبة حالة المصادقة
+                firebase.auth().onAuthStateChanged(user => {
+                    currentUser = user;
+                    observeAuthState(); // تحديث الهيدر
+                    initializeOrdersPage(); // بدء تهيئة الصفحة بعد معرفة حالة المستخدم
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                displayOrdersStatusMessage("حدث خطأ في تهيئة الاتصال. يرجى تحديث الصفحة.", "error");
+            }
+        } else {
+            console.error("Firebase config is not defined. Check firebase-config.js");
+            displayOrdersStatusMessage("خطأ في تحميل إعدادات التطبيق.", "error");
+        }
+
+        const loginRequiredMessage = document.getElementById('login-required-message-orders');
+        const ordersContent = document.getElementById('orders-content');
+        const ordersListContainer = document.getElementById('orders-list');
+        const ordersStatusMessage = document.getElementById('orders-status-message');
+        const orderDetailsModal = document.getElementById('order-details-modal');
+        const modalOrderId = document.getElementById('modal-order-id');
+        const modalOrderContent = document.getElementById('modal-order-content');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const chatModal = document.getElementById('chat-modal');
+        const chatOrderId = document.getElementById('chat-order-id');
+        const chatMessagesContainer = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatButton = document.getElementById('send-chat-button');
+        const closeChatButton = document.getElementById('close-chat-button');
+
+        /**
+         * تهيئة صفحة طلباتي: التحقق من تسجيل الدخول وعرض المحتوى.
+         */
+        function initializeOrdersPage() {
+            if (!currentUser) {
+                // المستخدم غير مسجل الدخول
+                loginRequiredMessage.classList.remove('hidden');
+                ordersContent.classList.add('hidden');
+                console.log("User not logged in, showing login prompt for orders.");
+            } else {
+                // المستخدم مسجل الدخول
+                loginRequiredMessage.classList.add('hidden');
+                ordersContent.classList.remove('hidden');
+                console.log("User logged in, loading orders...");
+                loadUserOrders();
+                setupModalEventListeners(); // ربط أحداث النوافذ المنبثقة
+            }
+        }
+
+        /**
+         * عرض رسالة حالة (تحميل، خطأ، لا توجد طلبات).
+         */
+        function displayOrdersStatusMessage(message, type = 'info') {
+            if (!ordersStatusMessage) return;
+            ordersStatusMessage.textContent = message;
+            ordersStatusMessage.className = 'text-center my-8'; // Reset classes
+            if (type === 'error') {
+                ordersStatusMessage.classList.add('text-red-500');
+            } else {
+                ordersStatusMessage.classList.add('text-gray-500');
+            }
+            ordersListContainer.innerHTML = ''; // مسح القائمة عند عرض رسالة حالة
+        }
+
+        /**
+         * عرض العناصر النائبة (Placeholders) أثناء تحميل الطلبات.
+         */
+        function showOrderPlaceholders() {
+            ordersListContainer.innerHTML = ''; // مسح المحتوى القديم
+            ordersStatusMessage.classList.add('hidden');
+            for (let i = 0; i < 3; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'order-placeholder bg-white rounded-lg shadow p-4 animate-pulse';
+                placeholder.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="h-4 bg-gray-300 rounded w-1/4"></div>
+                        <div class="h-4 bg-gray-300 rounded w-1/6"></div>
+                    </div>
+                    <div class="h-3 bg-gray-300 rounded w-1/2 mb-2"></div>
+                    <div class="h-3 bg-gray-300 rounded w-1/3"></div>
+                `;
+                ordersListContainer.appendChild(placeholder);
+            }
+        }
+
+        /**
+         * تحميل وعرض طلبات المستخدم.
+         */
+        async function loadUserOrders() {
+            if (!currentUser || !firebase.apps.length) return;
+
+            showOrderPlaceholders();
+            const db = firebase.firestore();
+
+            try {
+                // استخدام دالة fetchUserOrders من firestore.js
+                const orders = await fetchUserOrders(db, currentUser.uid);
+
+                ordersListContainer.innerHTML = ''; // مسح العناصر النائبة
+
+                if (orders.length === 0) {
+                    displayOrdersStatusMessage("لا توجد لديك طلبات سابقة.", 'info');
+                    return;
+                }
+
+                ordersStatusMessage.classList.add('hidden');
+
+                orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.className = 'bg-white rounded-lg shadow overflow-hidden';
+
+                    // تنسيق التاريخ
+                    const orderDate = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString('ar-EG') : 'غير محدد';
+
+                    // تحديد لون ونص الحالة
+                    let statusText = 'غير معروف';
+                    let statusColor = 'gray';
+                    switch (order.status) {
+                        case 'pending': statusText = 'قيد المراجعة'; statusColor = 'yellow'; break;
+                        case 'processing': statusText = 'قيد التجهيز'; statusColor = 'blue'; break;
+                        case 'shipped': statusText = 'تم الشحن'; statusColor = 'indigo'; break;
+                        case 'delivered': statusText = 'تم التوصيل'; statusColor = 'green'; break;
+                        case 'cancelled': statusText = 'ملغي'; statusColor = 'red'; break;
+                    }
+
+                    // عرض أول منتج كعينة
+                    const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
+                    const itemSummary = firstItem
+                        ? `${firstItem.name}${order.items.length > 1 ? ` و ${order.items.length - 1} منتجات أخرى` : ''}`
+                        : 'لا توجد منتجات';
+
+                    orderDiv.innerHTML = `
+                        <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1 sm:mb-0">رقم الطلب: <span class="font-medium text-gray-700">${order.id}</span></p>
+                                <p class="text-sm text-gray-500">تاريخ الطلب: <span class="font-medium text-gray-700">${orderDate}</span></p>
+                            </div>
+                            <span class="text-xs sm:text-sm font-semibold text-${statusColor}-600 bg-${statusColor}-100 px-2 py-1 rounded-full mt-2 sm:mt-0">${statusText}</span>
+                        </div>
+                        <div class="p-4">
+                            ${firstItem ? `
+                            <div class="flex items-center mb-3">
+                                <img src="${firstItem.image || 'assets/images/placeholder.png'}" alt="${firstItem.name}" class="w-12 h-12 object-cover rounded mr-3 ml-3">
+                                <p class="text-sm">${itemSummary}</p>
+                            </div>
+                            ` : `<p class="text-sm mb-3">${itemSummary}</p>`}
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                                <p class="font-semibold mb-2 sm:mb-0">المجموع: $${(order.totalAmount || 0).toFixed(2)}</p>
+                                <div class="flex space-x-3 space-x-reverse">
+                                    <button class="text-sm text-indigo-600 hover:underline view-order-details-button" data-order-id="${order.id}">عرض التفاصيل</button>
+                                    <button class="text-sm text-blue-600 hover:underline chat-with-support-button" data-order-id="${order.id}"><i class="fas fa-comments mr-1 ml-1"></i> محادثة</button>
+                                    <!-- يمكنك إضافة زر تقييم هنا إذا كان الطلب مكتمل -->
+                                    ${order.status === 'delivered' ? `<button class="text-sm text-green-600 hover:underline rate-order-button" data-order-id="${order.id}"><i class="fas fa-star mr-1 ml-1"></i> تقييم الطلب</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    ordersListContainer.appendChild(orderDiv);
+                });
+
+                // ربط الأحداث لأزرار التفاصيل والمحادثة والتقييم
+                ordersListContainer.querySelectorAll('.view-order-details-button').forEach(button => {
+                    button.addEventListener('click', handleViewOrderDetails);
+                });
+                ordersListContainer.querySelectorAll('.chat-with-support-button').forEach(button => {
+                    button.addEventListener('click', handleOpenChat);
+                });
+                ordersListContainer.querySelectorAll('.rate-order-button').forEach(button => {
+                    button.addEventListener('click', handleRateOrder);
+                });
+
+            } catch (error) {
+                console.error("Error loading user orders:", error);
+                displayOrdersStatusMessage("حدث خطأ أثناء تحميل الطلبات. يرجى المحاولة مرة أخرى.", "error");
+            }
+        }
+
+        /**
+         * معالجة النقر على زر عرض تفاصيل الطلب.
+         */
+        async function handleViewOrderDetails(event) {
+            const orderId = event.target.dataset.orderId;
+            if (!orderId || !currentUser) return;
+
+            console.log(`Fetching details for order: ${orderId}`);
+            modalOrderId.textContent = orderId;
+            modalOrderContent.innerHTML = '<p>جاري تحميل التفاصيل...</p>';
+            orderDetailsModal.classList.remove('hidden');
+
+            try {
+                const db = firebase.firestore();
+                // استخدام دالة fetchOrderById من firestore.js
+                const order = await fetchOrderById(db, orderId);
+
+                if (!order || order.userId !== currentUser.uid) {
+                    modalOrderContent.innerHTML = '<p class="text-red-500">لا يمكن الوصول إلى تفاصيل هذا الطلب.</p>';
+                    return;
+                }
+
+                // عرض تفاصيل الطلب في النافذة
+                const orderDate = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString('ar-EG') : 'غير محدد';
+                let itemsHtml = order.items.map(item => `
+                    <div class="flex items-center justify-between border-b py-2">
+                        <div class="flex items-center">
+                            <img src="${item.image || 'assets/images/placeholder.png'}" alt="${item.name}" class="w-10 h-10 object-cover rounded mr-3 ml-3">
+                            <div>
+                                <p class="font-medium">${item.name} ${item.size ? `(${item.size})` : ''}</p>
+                                <p class="text-sm text-gray-500">الكمية: ${item.quantity} | السعر: $${(item.price || 0).toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <span class="font-medium">$${((item.price || 0) * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('');
+
+                modalOrderContent.innerHTML = `
+                    <p><strong>تاريخ الطلب:</strong> ${orderDate}</p>
+                    <p><strong>الحالة:</strong> ${order.status || 'غير محدد'}</p>
+                    <p><strong>طريقة الدفع:</strong> ${order.paymentMethod === 'cod' ? 'الدفع عند الاستلام' : order.paymentMethod}</p>
+                    <h4 class="font-semibold mt-4 mb-2">عنوان الشحن:</h4>
+                    <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                        <p>${order.shippingAddress?.recipientName || ''}</p>
+                        <p>${order.shippingAddress?.addressLine || ''}</p>
+                        <p>${order.shippingAddress?.city || ''}, ${order.shippingAddress?.country || ''}</p>
+                        <p>الهاتف: ${order.shippingAddress?.phone || ''}</p>
+                    </div>
+                    <h4 class="font-semibold mt-4 mb-2">المنتجات:</h4>
+                    <div class="space-y-2">${itemsHtml}</div>
+                    <hr class="my-4">
+                    <div class="text-right space-y-1">
+                        <p>المجموع الفرعي: <span class="font-medium">$${(order.subtotal || 0).toFixed(2)}</span></p>
+                        <p>الشحن: <span class="font-medium">$${(order.shippingCost || 0).toFixed(2)}</span></p>
+                        <p class="font-bold text-lg">المجموع الإجمالي: <span class="font-medium">$${(order.totalAmount || 0).toFixed(2)}</span></p>
+                    </div>
+                    ${order.notes ? `<h4 class="font-semibold mt-4 mb-2">الملاحظات:</h4><p class="text-sm text-gray-600 bg-gray-50 p-3 rounded">${order.notes}</p>` : ''}
+                `;
+
+            } catch (error) {
+                console.error("Error fetching order details:", error);
+                modalOrderContent.innerHTML = '<p class="text-red-500">حدث خطأ أثناء تحميل تفاصيل الطلب.</p>';
+            }
+        }
+
+        /**
+         * معالجة النقر على زر المحادثة.
+         */
+        function handleOpenChat(event) {
+            const orderId = event.target.dataset.orderId;
+            if (!orderId || !currentUser) return;
+
+            console.log(`Opening chat for order: ${orderId}`);
+            chatOrderId.textContent = orderId;
+            chatMessagesContainer.innerHTML = '<p class="text-center text-gray-500 text-sm">جاري تحميل المحادثة...</p>';
+            chatInput.value = '';
+            chatModal.classList.remove('hidden');
+
+            // بدء الاستماع لرسائل المحادثة لهذا الطلب
+            startChatListener(orderId);
+        }
+
+        /**
+         * بدء الاستماع لرسائل المحادثة في Firestore.
+         * @param {string} orderId
+         */
+        function startChatListener(orderId) {
+            if (!currentUser) return;
+            const db = firebase.firestore();
+            const chatRef = db.collection('orders').doc(orderId).collection('chatMessages').orderBy('timestamp');
+
+            // إلغاء المستمع السابق إذا كان موجوداً
+            if (currentChatListener) {
+                currentChatListener();
+                console.log("Previous chat listener detached.");
+            }
+
+            currentChatListener = chatRef.onSnapshot(snapshot => {
+                console.log(`Received ${snapshot.docs.length} chat messages.`);
+                chatMessagesContainer.innerHTML = ''; // مسح الرسائل القديمة
+                if (snapshot.empty) {
+                    chatMessagesContainer.innerHTML = '<p class="text-center text-gray-500 text-sm">لا توجد رسائل في هذه المحادثة بعد.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        displayChatMessage(message);
+                    });
+                    // التمرير للأسفل لعرض أحدث رسالة
+                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                }
+            }, error => {
+                console.error("Error listening to chat messages:", error);
+                chatMessagesContainer.innerHTML = '<p class="text-center text-red-500 text-sm">حدث خطأ أثناء تحميل المحادثة.</p>';
+            });
+        }
+
+        /**
+         * عرض رسالة محادثة واحدة.
+         * @param {object} message - بيانات الرسالة (senderId, text, timestamp).
+         */
+        function displayChatMessage(message) {
+            const messageDiv = document.createElement('div');
+            const messageContent = document.createElement('div');
+            messageContent.textContent = message.text;
+            messageContent.className = 'p-2 rounded-lg max-w-[80%] break-words'; // break-words لمنع تجاوز النص
+
+            // تحديد نمط الرسالة بناءً على المرسل
+            if (message.senderId === currentUser.uid) {
+                messageDiv.className = 'flex justify-end mb-2';
+                messageContent.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                // نفترض أن المرسل الآخر هو الدعم الفني أو الأدمن
+                messageDiv.className = 'flex justify-start mb-2';
+                messageContent.classList.add('bg-blue-100', 'text-blue-800');
+            }
+
+            messageDiv.appendChild(messageContent);
+            chatMessagesContainer.appendChild(messageDiv);
+        }
+
+        /**
+         * إرسال رسالة محادثة جديدة.
+         */
+        async function sendChatMessage() {
+            const orderId = chatOrderId.textContent;
+            const text = chatInput.value.trim();
+            if (!text || !orderId || !currentUser) return;
+
+            console.log(`Sending message for order ${orderId}: ${text}`);
+            sendChatButton.disabled = true;
+            chatInput.disabled = true;
+
+            try {
+                const db = firebase.firestore();
+                // استخدام دالة addChatMessageToOrder من firestore.js
+                await addChatMessageToOrder(db, orderId, currentUser.uid, text);
+                chatInput.value = ''; // مسح حقل الإدخال بعد الإرسال
+                console.log("Message sent successfully.");
+            } catch (error) {
+                console.error("Error sending chat message:", error);
+                // يمكنك عرض رسالة خطأ للمستخدم
+                alert("حدث خطأ أثناء إرسال الرسالة.");
+            } finally {
+                sendChatButton.disabled = false;
+                chatInput.disabled = false;
+                chatInput.focus(); // إعادة التركيز على حقل الإدخال
+            }
+        }
+
+        /**
+         * إغلاق نافذة المحادثة وإيقاف المستمع.
+         */
+        function closeChat() {
+            chatModal.classList.add('hidden');
+            if (currentChatListener) {
+                currentChatListener(); // إيقاف المستمع
+                currentChatListener = null;
+                console.log("Chat listener detached on close.");
+            }
+        }
+
+        /**
+         * معالجة النقر على زر تقييم الطلب (وظيفة وهمية حالياً).
+         */
+        function handleRateOrder(event) {
+            const orderId = event.target.dataset.orderId;
+            alert(`سيتم فتح نافذة تقييم الطلب رقم: ${orderId} (لم يتم تنفيذها بعد).`);
+            // هنا يمكنك فتح نافذة modal جديدة لجمع التقييم (نجوم وتعليق)
+            // ثم حفظ التقييم في Firestore (مرتبط بالمنتجات أو الطلب نفسه)
+        }
+
+        /**
+         * ربط الأحداث للنوافذ المنبثقة (Modal).
+         */
+        function setupModalEventListeners() {
+            // إغلاق نافذة تفاصيل الطلب
+            closeModalButton.addEventListener('click', () => {
+                orderDetailsModal.classList.add('hidden');
+            });
+            // إغلاق النافذة عند النقر خارجها (اختياري)
+            orderDetailsModal.addEventListener('click', (event) => {
+                if (event.target === orderDetailsModal) {
+                    orderDetailsModal.classList.add('hidden');
+                }
+            });
+
+            // إغلاق نافذة المحادثة
+            closeChatButton.addEventListener('click', closeChat);
+            chatModal.addEventListener('click', (event) => {
+                if (event.target === chatModal) {
+                    closeChat();
+                }
+            });
+
+            // إرسال رسالة المحادثة
+            sendChatButton.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        }
+
+        // بدء تهيئة الصفحة عند تحميل المحتوى
+        document.addEventListener('DOMContentLoaded', () => {
+            // التأكد من تهيئة Firebase قبل بدء العمل
+            const checkFirebaseInterval = setInterval(() => {
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    clearInterval(checkFirebaseInterval);
+                    // لا نستدعي initializeOrdersPage هنا، ننتظر onAuthStateChanged
+                } else {
+                    console.log("Waiting for Firebase initialization...");
+                }
+            }, 100);
+        });
+
+    </script>
+
+</body>
+</html>
+

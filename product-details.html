@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر البردة - تفاصيل المنتج</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // 'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header / Navbar (نفس الهيدر المستخدم في الصفحات الأخرى) -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-primary">متجر البردة</a>
+            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-gray-600 hover:text-primary">الرئيسية</a>
+                <a href="products.html" class="text-gray-600 hover:text-primary">المنتجات</a>
+                <a href="my-orders.html" class="text-gray-600 hover:text-primary hidden" id="nav-my-orders-link">طلباتي</a>
+                <a href="about.html" class="text-gray-600 hover:text-primary">من نحن</a>
+                <a href="contact.html" class="text-gray-600 hover:text-primary">تواصل معنا</a>
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <a href="login.html" class="text-gray-600 hover:text-primary" id="nav-login-link">تسجيل الدخول</a>
+                <a href="profile.html" class="text-gray-600 hover:text-primary hidden" id="nav-profile-link"><i class="fas fa-user"></i> ملفي الشخصي</a>
+                <button class="text-gray-600 hover:text-red-500 hidden" id="nav-logout-button"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+            <div class="md:hidden flex items-center">
+                <a href="cart.html" class="relative text-gray-600 hover:text-primary ml-4">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="mobile-cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
+                </a>
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none"><i class="fas fa-bars text-xl"></i></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden bg-white border-t hidden">
+            <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">الرئيسية</a>
+            <a href="products.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">المنتجات</a>
+            <a href="my-orders.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-my-orders-link">طلباتي</a>
+            <a href="about.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">من نحن</a>
+            <a href="contact.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">تواصل معنا</a>
+            <hr class="my-1">
+            <a href="login.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100" id="mobile-login-link">تسجيل الدخول</a>
+            <a href="profile.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hidden" id="mobile-profile-link">ملفي الشخصي</a>
+            <button class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100 hidden" id="mobile-logout-button">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي لصفحة تفاصيل المنتج -->
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- رسالة حالة التحميل أو الخطأ -->
+        <div id="product-status-message" class="text-center my-8 hidden"></div>
+
+        <!-- حاوية تفاصيل المنتج -->
+        <section id="product-details-container" class="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
+            <!-- صور المنتج (صورة رئيسية + صور مصغرة إذا وجدت) -->
+            <div class="product-images">
+                <img id="main-product-image" src="assets/images/placeholder_large.png" alt="صورة المنتج" class="w-full h-auto max-h-96 object-contain rounded-lg mb-4 border">
+                <!-- (اختياري) حاوية للصور المصغرة -->
+                <!-- <div class="grid grid-cols-4 gap-2">
+                    <img src="..." alt="صورة مصغرة 1" class="w-full h-16 object-cover rounded border cursor-pointer hover:border-primary">
+                </div> -->
+            </div>
+
+            <!-- تفاصيل المنتج (الاسم، السعر، الوصف، الخيارات) -->
+            <div class="product-info">
+                <h1 id="product-name" class="text-2xl md:text-3xl font-bold mb-3">جاري تحميل اسم المنتج...</h1>
+                <p id="product-price" class="text-2xl text-primary font-bold mb-4">$0.00</p>
+
+                <!-- (اختياري) التقييم -->
+                <!-- <div class="flex items-center mb-4">
+                    <span class="text-yellow-400">
+                        <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star-half-alt"></i> <i class="far fa-star"></i>
+                    </span>
+                    <span class="text-sm text-gray-500 mr-2">(15 تقييم)</span>
+                </div> -->
+
+                <p id="product-description" class="text-gray-600 mb-6 leading-relaxed">جاري تحميل وصف المنتج...</p>
+
+                <!-- خيارات المنتج (مثل المقاس) -->
+                <div id="product-options" class="mb-6">
+                    <!-- سيتم ملء الخيارات هنا بواسطة JavaScript إذا كانت متاحة -->
+                    <!-- مثال للمقاس -->
+                    <div id="size-selector-container" class="hidden">
+                        <label for="product-size-select" class="block text-sm font-medium text-gray-700 mb-2">اختر المقاس:</label>
+                        <select id="product-size-select" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <!-- <option value="S">S</option> -->
+                            <!-- <option value="M">M</option> -->
+                            <!-- <option value="L">L</option> -->
+                        </select>
+                        <p id="size-error" class="text-red-500 text-sm mt-1 hidden">يرجى اختيار المقاس.</p>
+                    </div>
+                </div>
+
+                <!-- الكمية وزر الإضافة للسلة -->
+                <div class="flex items-center mb-6 space-x-4 space-x-reverse">
+                    <label for="product-quantity" class="text-sm font-medium text-gray-700">الكمية:</label>
+                    <input type="number" id="product-quantity" value="1" min="1" class="w-16 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center">
+                </div>
+
+                <button id="add-to-cart-button" class="w-full bg-primary text-white py-3 px-6 rounded hover:bg-opacity-90 transition duration-300 text-lg font-semibold">
+                    <i class="fas fa-cart-plus mr-2 ml-2"></i> إضافة إلى السلة
+                </button>
+
+                <!-- (اختياري) زر إضافة لقائمة الأمنيات -->
+                <button id="add-to-wishlist-button" class="mt-4 w-full bg-white text-gray-700 border border-gray-300 py-2 px-4 rounded hover:bg-gray-50 transition duration-300">
+                    <i class="far fa-heart mr-2 ml-2"></i> إضافة إلى قائمة الأمنيات
+                </button>
+                <p id="wishlist-feedback" class="text-sm mt-2 text-center hidden"></p>
+
+                <!-- رسالة تأكيد الإضافة للسلة -->
+                <p id="cart-feedback" class="text-green-600 text-sm mt-3 text-center hidden">تمت إضافة المنتج إلى السلة بنجاح!</p>
+
+            </div>
+        </section>
+
+        <!-- (اختياري) قسم المنتجات ذات الصلة -->
+        <!-- <section class="mt-12">
+            <h2 class="text-xl font-semibold mb-4">منتجات قد تعجبك أيضاً</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                 سيتم ملء المنتجات ذات الصلة هنا 
+            </div>
+        </section> -->
+
+        <!-- (اختياري) قسم التقييمات -->
+        <!-- <section class="mt-12 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">تقييمات العملاء</h2>
+             نموذج إضافة تقييم (إذا كان المستخدم مسجلاً واشترى المنتج) 
+             قائمة التقييمات 
+        </section> -->
+
+    </main>
+
+    <!-- Footer (نفس الفوتر المستخدم في الصفحات الأخرى) -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 متجر البردة. جميع الحقوق محفوظة.</p>
+            <div class="mt-4 space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> -->
+
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/firestore.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/profile.js"></script> <!-- نحتاج profile.js لوظائف قائمة الأمنيات -->
+
+    <!-- Page-Specific JavaScript for Product Details -->
+    <script>
+        let currentProduct = null; // لتخزين بيانات المنتج الحالي
+        let currentUserId = null; // لتخزين معرف المستخدم الحالي
+
+        // تهيئة Firebase
+        if (typeof firebaseConfig !== 'undefined') {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully on product details page.");
+
+                // مراقبة حالة المصادقة
+                firebase.auth().onAuthStateChanged(user => {
+                    currentUserId = user ? user.uid : null;
+                    observeAuthState(); // تحديث الهيدر
+                    // يمكنك تفعيل/تعطيل زر قائمة الأمنيات بناءً على حالة الدخول
+                    const wishlistButton = document.getElementById('add-to-wishlist-button');
+                    if (wishlistButton) {
+                        wishlistButton.disabled = !user;
+                        wishlistButton.title = user ? "إضافة إلى قائمة الأمنيات" : "يرجى تسجيل الدخول للإضافة إلى قائمة الأمنيات";
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                displayStatusMessage("حدث خطأ في تهيئة الاتصال. يرجى تحديث الصفحة.", "error");
+            }
+        } else {
+            console.error("Firebase config is not defined. Check firebase-config.js");
+            displayStatusMessage("خطأ في تحميل إعدادات التطبيق.", "error");
+        }
+
+        const statusMessage = document.getElementById('product-status-message');
+        const productContainer = document.getElementById('product-details-container');
+        const mainImage = document.getElementById('main-product-image');
+        const productName = document.getElementById('product-name');
+        const productPrice = document.getElementById('product-price');
+        const productDescription = document.getElementById('product-description');
+        const sizeSelectorContainer = document.getElementById('size-selector-container');
+        const sizeSelect = document.getElementById('product-size-select');
+        const sizeError = document.getElementById('size-error');
+        const quantityInput = document.getElementById('product-quantity');
+        const addToCartButton = document.getElementById('add-to-cart-button');
+        const cartFeedback = document.getElementById('cart-feedback');
+        const addToWishlistButton = document.getElementById('add-to-wishlist-button');
+        const wishlistFeedback = document.getElementById('wishlist-feedback');
+
+        /**
+         * عرض رسالة حالة (تحميل، خطأ).
+         */
+        function displayStatusMessage(message, type = 'info') {
+            if (!statusMessage) return;
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'text-red-500', 'text-gray-500');
+            if (type === 'error') {
+                statusMessage.classList.add('text-red-500');
+            } else {
+                statusMessage.classList.add('text-gray-500');
+            }
+            productContainer.classList.add('hidden'); // إخفاء حاوية المنتج عند عرض رسالة الحالة
+        }
+
+        /**
+         * تحميل تفاصيل المنتج بناءً على ID من URL.
+         */
+        async function loadProductDetails() {
+            if (!firebase.apps.length) {
+                console.warn("Firebase not ready yet.");
+                displayStatusMessage("جاري تهيئة الاتصال...", "info");
+                return;
+            }
+
+            // الحصول على معرف المنتج من رابط الصفحة (URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (!productId) {
+                displayStatusMessage("خطأ: معرف المنتج غير موجود في الرابط.", "error");
+                return;
+            }
+
+            console.log(`Loading details for product ID: ${productId}`);
+            displayStatusMessage("جاري تحميل تفاصيل المنتج...", "info");
+
+            try {
+                const db = firebase.firestore();
+                const product = await fetchProductById(db, productId);
+
+                if (!product) {
+                    displayStatusMessage("لم يتم العثور على المنتج المطلوب.", "error");
+                    return;
+                }
+
+                currentProduct = product; // حفظ بيانات المنتج الحالي
+
+                // ملء تفاصيل المنتج في الصفحة
+                productName.textContent = product.name;
+                productPrice.textContent = `$${product.price.toFixed(2)}`;
+                productDescription.textContent = product.description;
+                mainImage.src = product.imageUrl || 'assets/images/placeholder_large.png';
+                mainImage.alt = product.name;
+
+                // التعامل مع خيارات المقاس (إذا كانت موجودة)
+                // نفترض أن المقاسات مخزنة كمصفوفة في حقل 'availableSizes'
+                if (product.availableSizes && Array.isArray(product.availableSizes) && product.availableSizes.length > 0) {
+                    sizeSelect.innerHTML = '<option value="">-- اختر المقاس --</option>'; // خيار افتراضي
+                    product.availableSizes.forEach(size => {
+                        const option = document.createElement('option');
+                        option.value = size;
+                        option.textContent = size;
+                        sizeSelect.appendChild(option);
+                    });
+                    sizeSelectorContainer.classList.remove('hidden');
+                } else {
+                    sizeSelectorContainer.classList.add('hidden');
+                }
+
+                // إظهار حاوية المنتج وإخفاء رسالة الحالة
+                statusMessage.classList.add('hidden');
+                productContainer.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Error loading product details:", error);
+                displayStatusMessage("حدث خطأ أثناء تحميل تفاصيل المنتج. يرجى المحاولة مرة أخرى.", "error");
+            }
+        }
+
+        /**
+         * معالجة النقر على زر إضافة للسلة.
+         */
+        function handleAddToCart() {
+            if (!currentProduct) {
+                console.error("Product data not loaded yet.");
+                return;
+            }
+
+            const quantity = parseInt(quantityInput.value) || 1;
+            let selectedSize = null;
+            let sizeIsValid = true;
+
+            // التحقق من اختيار المقاس إذا كان مطلوباً
+            if (!sizeSelectorContainer.classList.contains('hidden')) {
+                selectedSize = sizeSelect.value;
+                if (!selectedSize) {
+                    sizeError.classList.remove('hidden');
+                    sizeIsValid = false;
+                } else {
+                    sizeError.classList.add('hidden');
+                }
+            }
+
+            if (!sizeIsValid) {
+                return; // إيقاف الإضافة إذا لم يتم اختيار المقاس المطلوب
+            }
+
+            // استخدام دالة addToCart من cart.js
+            addToCart(currentProduct, quantity, selectedSize);
+
+            // إظهار رسالة تأكيد
+            cartFeedback.classList.remove('hidden');
+            setTimeout(() => {
+                cartFeedback.classList.add('hidden');
+            }, 3000); // إخفاء الرسالة بعد 3 ثوانٍ
+        }
+
+        /**
+         * معالجة النقر على زر إضافة لقائمة الأمنيات.
+         */
+        async function handleAddToWishlistClick() {
+            if (!currentProduct || !currentUserId) {
+                console.warn("Product data or user ID not available for wishlist action.");
+                wishlistFeedback.textContent = "يرجى تسجيل الدخول أولاً.";
+                wishlistFeedback.className = "text-sm mt-2 text-center text-red-500";
+                wishlistFeedback.classList.remove('hidden');
+                setTimeout(() => wishlistFeedback.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const db = firebase.firestore();
+            addToWishlistButton.disabled = true;
+            wishlistFeedback.classList.add('hidden');
+
+            try {
+                // استخدام دالة handleAddToWishlist من profile.js
+                await handleAddToWishlist(db, currentUserId, currentProduct.id);
+                wishlistFeedback.textContent = "تمت الإضافة إلى قائمة الأمنيات!";
+                wishlistFeedback.className = "text-sm mt-2 text-center text-green-600";
+                // يمكنك تغيير أيقونة الزر هنا لتدل على أنه تمت الإضافة
+                addToWishlistButton.innerHTML = `<i class="fas fa-heart mr-2 ml-2 text-red-500"></i> تمت الإضافة للأمنيات`;
+            } catch (error) {
+                console.error("Error adding to wishlist from details page:", error);
+                wishlistFeedback.textContent = "حدث خطأ أثناء الإضافة.";
+                wishlistFeedback.className = "text-sm mt-2 text-center text-red-500";
+                addToWishlistButton.disabled = false; // إعادة تفعيل الزر عند الخطأ
+            } finally {
+                wishlistFeedback.classList.remove('hidden');
+                // لا نعيد تفعيل الزر عند النجاح لمنع الإضافة المتكررة (أو يمكنك إضافة منطق للحذف)
+                // setTimeout(() => wishlistFeedback.classList.add('hidden'), 3000);
+            }
+        }
+
+        // ربط الأحداث
+        if (addToCartButton) {
+            addToCartButton.addEventListener('click', handleAddToCart);
+        }
+        if (addToWishlistButton) {
+            addToWishlistButton.addEventListener('click', handleAddToWishlistClick);
+        }
+        // إخفاء رسالة خطأ المقاس عند تغييره
+        if (sizeSelect) {
+            sizeSelect.addEventListener('change', () => {
+                if (sizeSelect.value) {
+                    sizeError.classList.add('hidden');
+                }
+            });
+        }
+
+        // تحميل تفاصيل المنتج عند تحميل الصفحة
+        document.addEventListener("DOMContentLoaded", () => {
+            // تأخير بسيط للتأكد من تهيئة Firebase
+            setTimeout(() => {
+                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    loadProductDetails();
+                 } else {
+                     // محاولة أخرى بعد فترة أطول قليلاً
+                     setTimeout(loadProductDetails, 1500);
+                 }
+            }, 500);
+        });
+
+    </script>
+
+</body>
+</html>
+
