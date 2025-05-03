@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المنتجات - لوحة تحكم البردة</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- الشريط الجانبي (Sidebar) -->
+    <aside class="fixed inset-y-0 right-0 bg-gray-800 text-white w-64 transform transition-transform duration-300 ease-in-out z-40 hidden md:block">
+        <div class="p-4 text-2xl font-bold border-b border-gray-700">
+            <a href="index.html">لوحة تحكم البردة</a>
+        </div>
+        <nav class="mt-6">
+            <a href="index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات
+            </a>
+            <a href="manage-products.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-100 bg-gray-700 rounded-md">
+                <i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات
+            </a>
+            <a href="view-orders.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات
+            </a>
+            <a href="statistics.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات
+            </a>
+            <hr class="my-4 border-gray-700">
+            <a href="../index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-store mr-2 ml-2"></i> عرض المتجر
+            </a>
+            <button id="admin-logout-button" class="flex items-center w-full px-4 py-2 mt-1 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 rounded-md">
+                <i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج
+            </button>
+        </nav>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="md:mr-64 transition-all duration-300 ease-in-out">
+        <!-- شريط علوي (Top Bar) للموبايل -->
+        <header class="bg-white shadow-md md:hidden sticky top-0 z-30">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <span class="text-xl font-bold text-primary">إدارة المنتجات</span>
+                <button id="mobile-admin-menu-button" class="text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- القائمة المنسدلة للموبايل -->
+            <div id="mobile-admin-menu" class="bg-white border-t hidden">
+                 <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات</a>
+                 <a href="manage-products.html" class="block px-4 py-2 text-gray-600 bg-gray-100"><i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات</a>
+                 <a href="view-orders.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات</a>
+                 <a href="statistics.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات</a>
+                 <hr class="my-1">
+                 <a href="../index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-store mr-2 ml-2"></i> عرض المتجر</a>
+                 <button id="mobile-admin-logout-button" class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <!-- منطقة المحتوى الفعلي للصفحة -->
+        <div class="container mx-auto px-4 py-8">
+
+            <!-- رسالة التحميل -->
+            <div id="admin-loading-message" class="text-center py-10">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-500"></i>
+                <p class="mt-2 text-gray-600">جاري التحميل والتحقق من الصلاحيات...</p>
+            </div>
+
+            <!-- رسالة رفض الوصول -->
+            <div id="admin-access-denied" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow max-w-md mx-auto text-center" role="alert">
+                <p class="font-bold mb-2"><i class="fas fa-exclamation-triangle mr-1 ml-1"></i> الوصول مرفوض</p>
+                <p>ليس لديك الصلاحيات اللازمة للوصول إلى هذه الصفحة.</p>
+                <a href="../index.html" class="mt-4 inline-block bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm">العودة للمتجر</a>
+            </div>
+
+            <!-- المحتوى الخاص بصفحة إدارة المنتجات (يظهر فقط للأدمن) -->
+            <div id="admin-content" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">إدارة المنتجات</h1>
+                    <button id="add-product-button" class="bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90">
+                        <i class="fas fa-plus mr-1 ml-1"></i> إضافة منتج جديد
+                    </button>
+                </div>
+
+                <!-- جدول عرض المنتجات -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المنتج</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">السعر</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المخزون</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">إجراءات</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- صف التحميل -->
+                            <tr id="loading-products-row">
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2 ml-2"></i> جاري تحميل المنتجات...
+                                </td>
+                            </tr>
+                            <!-- صف لا توجد منتجات -->
+                            <tr id="no-products-row" class="hidden">
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">لا توجد منتجات لعرضها.</td>
+                            </tr>
+                            <!-- سيتم ملء المنتجات هنا بواسطة JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div> <!-- نهاية admin-content -->
+
+        </div>
+    </main>
+
+    <!-- نافذة إضافة/تعديل المنتج (Modal) -->
+    <div id="product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center p-4">
+        <div class="relative bg-white w-full max-w-2xl mx-auto rounded-lg shadow-xl">
+            <form id="product-form" class="space-y-4">
+                <!-- رأس النافذة -->
+                <div class="flex justify-between items-center border-b p-4">
+                    <h3 id="product-modal-title" class="text-xl font-semibold">إضافة منتج جديد</h3>
+                    <button type="button" id="close-product-modal-button" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                </div>
+                <!-- محتوى النموذج -->
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <input type="hidden" id="product-id">
+                    <input type="hidden" id="product-image-url-hidden"> <!-- لتخزين رابط الصورة الحالي عند التعديل -->
+
+                    <div>
+                        <label for="product-name" class="block text-sm font-medium text-gray-700">اسم المنتج</label>
+                        <input type="text" id="product-name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </div>
+                    <div>
+                        <label for="product-description" class="block text-sm font-medium text-gray-700">الوصف</label>
+                        <textarea id="product-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="product-price" class="block text-sm font-medium text-gray-700">السعر</label>
+                            <input type="number" id="product-price" required min="0.01" step="0.01" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+                        <div>
+                            <label for="product-category" class="block text-sm font-medium text-gray-700">الفئة</label>
+                            <input type="text" id="product-category" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="product-stock" class="block text-sm font-medium text-gray-700">المخزون</label>
+                            <input type="number" id="product-stock" required min="0" step="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+                        <div>
+                            <label for="product-sizes" class="block text-sm font-medium text-gray-700">المقاسات المتوفرة (افصل بفواصل)</label>
+                            <input type="text" id="product-sizes" placeholder="مثال: S, M, L, XL" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="product-image" class="block text-sm font-medium text-gray-700">صورة المنتج</label>
+                        <input type="file" id="product-image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:ml-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        <img id="product-image-preview" src="../assets/images/placeholder.png" alt="معاينة الصورة" class="mt-2 h-24 w-24 object-cover rounded hidden">
+                        <p class="mt-1 text-xs text-gray-500">اترك الحقل فارغاً للاحتفاظ بالصورة الحالية عند التعديل.</p>
+                    </div>
+                    <p id="product-form-error" class="text-red-500 text-sm hidden"></p>
+                </div>
+                <!-- أزرار النافذة -->
+                <div class="border-t p-4 flex justify-end space-x-3 space-x-reverse bg-gray-50">
+                    <button type="button" id="cancel-product-modal-button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 transition duration-300">إلغاء</button>
+                    <button type="submit" class="bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-300">حفظ المنتج</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> <!-- Storage مطلوب هنا -->
+
+    <!-- Firebase Configuration -->
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="../js/firestore.js"></script>
+    <script src="../js/storage.js"></script> <!-- يحتوي على وظائف رفع وحذف الصور -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+
+    <!-- Page-Specific JavaScript -->
+    <script>
+        // ربط زر تسجيل الخروج
+        document.getElementById('admin-logout-button')?.addEventListener('click', handleLogout);
+        document.getElementById('mobile-admin-logout-button')?.addEventListener('click', handleLogout);
+
+        // ربط زر قائمة الموبايل
+        const mobileMenuButton = document.getElementById('mobile-admin-menu-button');
+        const mobileMenu = document.getElementById('mobile-admin-menu');
+        mobileMenuButton?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // التهيئة العامة لصفحة الأدمن تتم الآن داخل admin.js
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     initializeAdminPage(initManageProductsPage);
+        // });
+    </script>
+
+</body>
+</html>
+

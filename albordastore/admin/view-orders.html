@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الطلبات - لوحة تحكم البردة</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- الشريط الجانبي (Sidebar) -->
+    <aside class="fixed inset-y-0 right-0 bg-gray-800 text-white w-64 transform transition-transform duration-300 ease-in-out z-40 hidden md:block">
+        <div class="p-4 text-2xl font-bold border-b border-gray-700">
+            <a href="index.html">لوحة تحكم البردة</a>
+        </div>
+        <nav class="mt-6">
+            <a href="index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات
+            </a>
+            <a href="manage-products.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات
+            </a>
+            <a href="view-orders.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-100 bg-gray-700 rounded-md">
+                <i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات
+            </a>
+            <a href="statistics.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات
+            </a>
+            <hr class="my-4 border-gray-700">
+            <a href="../index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-store mr-2 ml-2"></i> عرض المتجر
+            </a>
+            <button id="admin-logout-button" class="flex items-center w-full px-4 py-2 mt-1 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 rounded-md">
+                <i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج
+            </button>
+        </nav>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="md:mr-64 transition-all duration-300 ease-in-out">
+        <!-- شريط علوي (Top Bar) للموبايل -->
+        <header class="bg-white shadow-md md:hidden sticky top-0 z-30">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <span class="text-xl font-bold text-primary">عرض الطلبات</span>
+                <button id="mobile-admin-menu-button" class="text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- القائمة المنسدلة للموبايل -->
+            <div id="mobile-admin-menu" class="bg-white border-t hidden">
+                 <a href="index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات</a>
+                 <a href="manage-products.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات</a>
+                 <a href="view-orders.html" class="block px-4 py-2 text-gray-600 bg-gray-100"><i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات</a>
+                 <a href="statistics.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات</a>
+                 <hr class="my-1">
+                 <a href="../index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-store mr-2 ml-2"></i> عرض المتجر</a>
+                 <button id="mobile-admin-logout-button" class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <!-- منطقة المحتوى الفعلي للصفحة -->
+        <div class="container mx-auto px-4 py-8">
+
+            <!-- رسالة التحميل -->
+            <div id="admin-loading-message" class="text-center py-10">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-500"></i>
+                <p class="mt-2 text-gray-600">جاري التحميل والتحقق من الصلاحيات...</p>
+            </div>
+
+            <!-- رسالة رفض الوصول -->
+            <div id="admin-access-denied" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow max-w-md mx-auto text-center" role="alert">
+                <p class="font-bold mb-2"><i class="fas fa-exclamation-triangle mr-1 ml-1"></i> الوصول مرفوض</p>
+                <p>ليس لديك الصلاحيات اللازمة للوصول إلى هذه الصفحة.</p>
+                <a href="../index.html" class="mt-4 inline-block bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm">العودة للمتجر</a>
+            </div>
+
+            <!-- المحتوى الخاص بصفحة عرض الطلبات (يظهر فقط للأدمن) -->
+            <div id="admin-content" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">عرض الطلبات</h1>
+                    <!-- فلتر الحالة -->
+                    <div>
+                        <label for="status-filter" class="mr-2 ml-2 text-sm font-medium text-gray-700">فلترة حسب الحالة:</label>
+                        <select id="status-filter" name="status-filter" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">الكل</option>
+                            <option value="pending">قيد المراجعة</option>
+                            <option value="processing">قيد التجهيز</option>
+                            <option value="shipped">تم الشحن</option>
+                            <option value="delivered">تم التوصيل</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- جدول عرض الطلبات -->
+                <div class="bg-white shadow overflow-x-auto sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الطلب</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التاريخ</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">العميل</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">البريد/المعرف</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المجموع</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">إجراءات</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- صف التحميل -->
+                            <tr id="loading-orders-row">
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2 ml-2"></i> جاري تحميل الطلبات...
+                                </td>
+                            </tr>
+                            <!-- صف لا توجد طلبات -->
+                            <tr id="no-orders-row" class="hidden">
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">لا توجد طلبات لعرضها حسب الفلتر المحدد.</td>
+                            </tr>
+                            <!-- سيتم ملء الطلبات هنا بواسطة JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div> <!-- نهاية admin-content -->
+
+        </div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> -->
+
+    <!-- Firebase Configuration -->
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="../js/firestore.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+
+    <!-- Page-Specific JavaScript -->
+    <script>
+        // ربط زر تسجيل الخروج
+        document.getElementById('admin-logout-button')?.addEventListener('click', handleLogout);
+        document.getElementById('mobile-admin-logout-button')?.addEventListener('click', handleLogout);
+
+        // ربط زر قائمة الموبايل
+        const mobileMenuButton = document.getElementById('mobile-admin-menu-button');
+        const mobileMenu = document.getElementById('mobile-admin-menu');
+        mobileMenuButton?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // التهيئة العامة لصفحة الأدمن تتم الآن داخل admin.js
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     initializeAdminPage(initViewOrdersPage);
+        // });
+    </script>
+
+</body>
+</html>
+

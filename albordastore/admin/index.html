@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأدمن - متجر البردة</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- رابط لملف الأنماط المخصص -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- أيقونات Font Awesome (اختياري) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- تهيئة Tailwind (اختياري) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4a5568',
+                        secondary: '#a0aec0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* يمكنك إضافة أنماط خاصة بلوحة التحكم هنا إذا لزم الأمر */
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- الشريط الجانبي (Sidebar) -->
+    <aside class="fixed inset-y-0 right-0 bg-gray-800 text-white w-64 transform transition-transform duration-300 ease-in-out z-40 hidden md:block">
+        <div class="p-4 text-2xl font-bold border-b border-gray-700">
+            <a href="index.html">لوحة تحكم البردة</a>
+        </div>
+        <nav class="mt-6">
+            <a href="index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-100 bg-gray-700 rounded-md">
+                <i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات
+            </a>
+            <a href="manage-products.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات
+            </a>
+            <a href="view-orders.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات
+            </a>
+            <a href="statistics.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات
+            </a>
+            <!-- يمكنك إضافة روابط أخرى هنا (إدارة المستخدمين، الإعدادات، إلخ) -->
+            <hr class="my-4 border-gray-700">
+            <a href="../index.html" class="flex items-center px-4 py-2 mt-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                <i class="fas fa-store mr-2 ml-2"></i> عرض المتجر
+            </a>
+            <button id="admin-logout-button" class="flex items-center w-full px-4 py-2 mt-1 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 rounded-md">
+                <i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج
+            </button>
+        </nav>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="md:mr-64 transition-all duration-300 ease-in-out">
+        <!-- شريط علوي (Top Bar) للموبايل -->
+        <header class="bg-white shadow-md md:hidden sticky top-0 z-30">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <span class="text-xl font-bold text-primary">لوحة تحكم البردة</span>
+                <button id="mobile-admin-menu-button" class="text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- القائمة المنسدلة للموبايل -->
+            <div id="mobile-admin-menu" class="bg-white border-t hidden">
+                 <a href="index.html" class="block px-4 py-2 text-gray-600 bg-gray-100"><i class="fas fa-tachometer-alt mr-2 ml-2"></i> لوحة المعلومات</a>
+                 <a href="manage-products.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-box mr-2 ml-2"></i> إدارة المنتجات</a>
+                 <a href="view-orders.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-shopping-cart mr-2 ml-2"></i> عرض الطلبات</a>
+                 <a href="statistics.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-chart-bar mr-2 ml-2"></i> الإحصائيات</a>
+                 <hr class="my-1">
+                 <a href="../index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100"><i class="fas fa-store mr-2 ml-2"></i> عرض المتجر</a>
+                 <button id="mobile-admin-logout-button" class="block w-full text-right px-4 py-2 text-red-600 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2 ml-2"></i> تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <!-- منطقة المحتوى الفعلي للصفحة -->
+        <div class="container mx-auto px-4 py-8">
+
+            <!-- رسالة التحميل -->
+            <div id="admin-loading-message" class="text-center py-10">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-500"></i>
+                <p class="mt-2 text-gray-600">جاري التحميل والتحقق من الصلاحيات...</p>
+            </div>
+
+            <!-- رسالة رفض الوصول -->
+            <div id="admin-access-denied" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow max-w-md mx-auto text-center" role="alert">
+                <p class="font-bold mb-2"><i class="fas fa-exclamation-triangle mr-1 ml-1"></i> الوصول مرفوض</p>
+                <p>ليس لديك الصلاحيات اللازمة للوصول إلى لوحة التحكم.</p>
+                <p class="mt-2 text-sm">إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع مسؤول النظام.</p>
+                <a href="../index.html" class="mt-4 inline-block bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm">العودة للمتجر</a>
+            </div>
+
+            <!-- المحتوى الخاص بصفحة لوحة المعلومات (يظهر فقط للأدمن) -->
+            <div id="admin-content" class="hidden">
+                <h1 class="text-3xl font-bold mb-6">لوحة المعلومات</h1>
+
+                <!-- هنا يمكنك إضافة ملخصات وإحصائيات سريعة -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- مثال: عدد الطلبات الجديدة -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 text-white rounded-full p-3">
+                                <i class="fas fa-shopping-cart text-xl"></i>
+                            </div>
+                            <div class="mr-4">
+                                <p class="text-gray-500 text-sm">طلبات جديدة</p>
+                                <p id="new-orders-count" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مثال: عدد المنتجات -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="bg-green-500 text-white rounded-full p-3">
+                                <i class="fas fa-box text-xl"></i>
+                            </div>
+                            <div class="mr-4">
+                                <p class="text-gray-500 text-sm">إجمالي المنتجات</p>
+                                <p id="total-products-count" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مثال: عدد المستخدمين (إذا تم تتبعهم) -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 text-white rounded-full p-3">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                            <div class="mr-4">
+                                <p class="text-gray-500 text-sm">إجمالي المستخدمين</p>
+                                <p id="total-users-count" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مثال: إجمالي المبيعات (إذا تم تتبعه) -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="bg-red-500 text-white rounded-full p-3">
+                                <i class="fas fa-dollar-sign text-xl"></i>
+                            </div>
+                            <div class="mr-4">
+                                <p class="text-gray-500 text-sm">إجمالي المبيعات</p>
+                                <p id="total-sales" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- يمكنك إضافة أقسام أخرى هنا، مثل آخر الطلبات، المنتجات الأكثر مبيعاً، إلخ -->
+                <div class="mt-8 bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-xl font-semibold mb-4">روابط سريعة</h2>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="manage-products.html" class="bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90"><i class="fas fa-plus mr-1 ml-1"></i> إضافة منتج جديد</a>
+                        <a href="view-orders.html" class="bg-secondary text-gray-800 py-2 px-4 rounded hover:bg-gray-400"><i class="fas fa-eye mr-1 ml-1"></i> عرض الطلبات المعلقة</a>
+                    </div>
+                </div>
+
+            </div> <!-- نهاية admin-content -->
+
+        </div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script> -->
+
+    <!-- Firebase Configuration -->
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script src="../js/firestore.js"></script> <!-- يحتوي الآن على checkIfAdmin -->
+    <script src="../js/auth.js"></script> <!-- يحتوي على دالة تسجيل الخروج -->
+    <script src="../js/admin.js"></script> <!-- يحتوي على initializeAdminPage والوظائف الخاصة بالأدمن -->
+
+    <!-- Page-Specific JavaScript for Admin Index -->
+    <script>
+        // دالة تهيئة خاصة بصفحة لوحة المعلومات الرئيسية للأدمن
+        async function initAdminDashboard(db, user) {
+            console.log("Initializing admin dashboard...");
+            // يمكنك هنا جلب الإحصائيات وعرضها
+            const newOrdersCountEl = document.getElementById("new-orders-count");
+            const totalProductsCountEl = document.getElementById("total-products-count");
+            // ... وعناصر الإحصائيات الأخرى
+
+            try {
+                // مثال: جلب عدد الطلبات المعلقة (pending)
+                const pendingOrdersQuery = db.collection('orders').where('status', '==', 'pending');
+                const pendingOrdersSnapshot = await pendingOrdersQuery.get();
+                if(newOrdersCountEl) newOrdersCountEl.textContent = pendingOrdersSnapshot.size;
+
+                // مثال: جلب عدد المنتجات الكلي
+                const productsQuery = db.collection('products');
+                const productsSnapshot = await productsQuery.get();
+                if(totalProductsCountEl) totalProductsCountEl.textContent = productsSnapshot.size;
+
+                // يمكنك إضافة جلب إحصائيات أخرى هنا
+                document.getElementById("total-users-count").textContent = "N/A"; // يتطلب تتبع المستخدمين
+                document.getElementById("total-sales").textContent = "N/A"; // يتطلب تتبع المبيعات
+
+            } catch (error) {
+                console.error("Error fetching dashboard stats:", error);
+                if(newOrdersCountEl) newOrdersCountEl.textContent = "خطأ";
+                if(totalProductsCountEl) totalProductsCountEl.textContent = "خطأ";
+            }
+        }
+
+        // استدعاء دالة التهيئة العامة للأدمن وتمرير دالة تهيئة هذه الصفحة
+        // يتم استدعاء هذا الآن من داخل admin.js بناءً على المسار
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     initializeAdminPage(initAdminDashboard);
+        // });
+
+        // ربط زر تسجيل الخروج
+        document.getElementById('admin-logout-button')?.addEventListener('click', handleLogout);
+        document.getElementById('mobile-admin-logout-button')?.addEventListener('click', handleLogout);
+
+        // ربط زر قائمة الموبايل
+        const mobileMenuButton = document.getElementById('mobile-admin-menu-button');
+        const mobileMenu = document.getElementById('mobile-admin-menu');
+        mobileMenuButton?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+    </script>
+
+</body>
+</html>
+
